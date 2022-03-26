@@ -28,8 +28,8 @@ function Modules.Madara()
 				MANGAINFO.Title=x.XPathStringAll('//div[@class="post-title post-sigle-title"]/*[self::h1 or self::h2 or self::h3]/text()', '')
 			elseif MODULE.Name == 'GetManhwa' then
 				MANGAINFO.Title=x.XPathStringAll('//div[@class="post-title-dpage"]/h3')
-			elseif MODULE.ID == '73cfa250c661470c81428d99cdb8a140' then --MangaCrab
-				MANGAINFO.Title=x.XPathStringAll('//*[@id="manga-title"]/h1/text()')				
+			else
+				MANGAINFO.Title = x.XPathStringAll('//*[@id="manga-title"]/h1/text()')
 			end
 			MANGAINFO.CoverLink=x.XPathString('//div[@class="summary_image"]//img/@data-src')
 			if MANGAINFO.CoverLink == '' then
@@ -92,7 +92,7 @@ function Modules.Madara()
 					MANGAINFO.ChapterLinks.Add(v.GetAttribute('href'))
 					MANGAINFO.ChapterNames.Add(x.XPathString('p', v))
 				end
-			elseif MODULE.ID == 'ac42a85566244b7e836679491ce679e6' or MODULE.ID == '123fa1ed637e469b8cb4a154965a6423' then -- YugenMangas, DragonTranslation
+			elseif MODULE.ID == '123fa1ed637e469b8cb4a154965a6423' then -- DragonTranslation
 				local v for v in x.XPath('//li[contains(@class, "wp-manga-chapter")]').Get() do
 					MANGAINFO.ChapterLinks.Add(x.XPathString('a/@href', v))
 					MANGAINFO.ChapterNames.Add(x.XPathString('a/text()[not(parent::span)]', v))
@@ -110,6 +110,12 @@ function Modules.Madara()
 				if HTTP.POST(MANGAINFO.URL .. 'ajax/chapters') then
 					local x = CreateTXQuery(HTTP.Document)
 					x.XPathHREFAll('//li[contains(@class, "wp-manga-chapter")]/a[1]', MANGAINFO.ChapterLinks, MANGAINFO.ChapterNames)
+					if MANGAINFO.ChapterLinks.Count == 0 then
+						local v for v in x.XPath('//div[@class="chapter-link"]/a').Get() do
+							MANGAINFO.ChapterLinks.Add(v.GetAttribute('href'))
+							MANGAINFO.ChapterNames.Add(x.XPathString('p', v))
+						end
+					end
 				end
 			end
 			if MANGAINFO.ChapterLinks.Count == 0 then
@@ -169,6 +175,8 @@ function Modules.Madara()
 				x.XPathStringAll('//div[@class="read-content"]/img/@src', TASK.PageLinks)
 			elseif MODULE.ID == '123fa1ed637aswet8cb4a154965a6423' then -- LeerManga
 				x.XPathStringAll('//*[@id="images_chapter"]//img/@data-src', TASK.PageLinks)
+			elseif MODULE.ID == '283a39fb8ac44c41a3bd7080c5dd73cf' then -- Manhuaus
+				x.XPathStringAll('//div[@class="reading-content"]//img/@data-src', TASK.PageLinks)
 			else
 				x.XPathStringAll('//div[contains(@class, "page-break")]/img/@data-src', TASK.PageLinks)
 			end
@@ -297,6 +305,7 @@ function Init()
 	end
 	AddWebsiteModule('29e070b824344c8697ceb9554a6d1d4b', 'MangazukiClub', 'https://mangazuki.club')
 	AddWebsiteModule('1d7090e3140f4957973a0e063c43f106', 'ManhwaRaw', 'https://manhwaraw.com')
+	AddWebsiteModule('f164e6052faf4c8a896a8be3cef7cb61', 'RawDex', 'https://rawdex.net')
 
 	cat = 'English'
 	AddWebsiteModule('4bce5afe51b646c6b0d30329a069ee83', 'IsekaiScan', 'https://isekaiscan.com')
@@ -319,6 +328,11 @@ function Init()
 	AddWebsiteModule('1f1ff002597f4f23a0dad6f25ea0612c', 'MangaClash', 'https://mangaclash.com')
 	AddWebsiteModule('e3f643dfdca24576adf5b87c99878bfb', 'Mangax18', 'https://mangax18.com')
 	AddWebsiteModule('76b33c241c0d44a6b4a5b8dd86ec7750', 'ManhuaES', 'https://manhuaes.com')
+	AddWebsiteModule('29003d3eb6c348ab8f8d4ed0cb8f7c6f', 'AllTopManga', 'https://alltopmanga.com')
+	AddWebsiteModule('89497fea6b55470c89fac1eb8f75f61a', 'MangaHyphenTx', 'https://manga-tx.com')
+	AddWebsiteModule('e62d472cc686400b91528c5b52ed0452', 'MangaBin', 'https://mangabin.com')
+	AddWebsiteModule('27433894c7594c97ad00ea083947c28c', 'Manga1stOnline', 'https://manga1st.online')
+	AddWebsiteModule('e4e226f0270440b7b906171082c8a02f', 'ColoredManga', 'https://coloredmanga.com')
 
 	cat = 'English-Scanlation'
 	AddWebsiteModule('f17a22a1a24640ecb2ae4f51c47a45c8', 'TrashScanlations', 'https://trashscanlations.com')
@@ -344,7 +358,7 @@ function Init()
 	AddWebsiteModule('1b7fba26de3e49d7af3ab6549921c567', 'SKScans', 'https://skscans.com')
 	AddWebsiteModule('716dab165a0f4f80b0ee49a4518866a2', 'GrazeScans', 'https://grazescans.com')
 	AddWebsiteModule('4eff54457e544446a33c569d2b85ced0', 'TritiniaScans', 'https://tritinia.com')
-	AddWebsiteModule('f1371b4a0cd04254ae4b1f5065a46dc8', 'GDScans', 'https://gdscan.xyz')
+	AddWebsiteModule('f1371b4a0cd04254ae4b1f5065a46dc8', 'GDScans', 'https://gdstmp.site')
 	AddWebsiteModule('b94734480a0e4f25a21c0f01cd5e9779', 'XuNScans', 'https://xunscans.xyz')
 	AddWebsiteModule('e8ef6a7e02bd405785d504b60d5ee55e', 'ImperfectComic', 'https://imperfectcomic.com')
 	AddWebsiteModule('5aca1e42e8544aff8420b617c7a3983e', 'ComicDom', 'https://comicdom.org')
@@ -357,6 +371,9 @@ function Init()
 	AddWebsiteModule('37538acb3171418bbf5a52b3e255afb6', 'LHTranslation', 'https://lhtranslation.net')
 	AddWebsiteModule('a6e1277d9b8b4f99afb2de63f4718eb9', 'JiroComics', 'https://jirocomics.com')
 	AddWebsiteModule('f4aba5424ddd4ed6a1b6245f08c64573', 'PlatinumScans', 'https://platinumscans.com')
+	AddWebsiteModule('c34264a0b72a49b58f2a4e9476f2fd15', 'Mangas20', 'https://mangas20.com')
+	AddWebsiteModule('1a88330492134d828d9549f14f67bfdd', 'ManhuaDragon', 'https://manhuadragon.com')
+	AddWebsiteModule('5e8a01ec43e24ed28372bab7f2c2c531', 'DragonTea', 'https://dragontea.ink')
 
 	cat = 'French'
 	AddWebsiteModule('41867fa36f2f49959df9fef8aa53ffb5', 'WakaScan', 'https://wakascan.com')
@@ -456,7 +473,7 @@ function Init()
 	AddWebsiteModule('c3a0df4ce34245cab5e5d9d9b67a782e', 'ManhwaLatino', 'https://manhwa-latino.com')
 	AddWebsiteModule('fa9659f5511441c6a5b5cc969d91a204', 'MangaNeloLink', 'https://manganelo.link')
 	AddWebsiteModule('c7406bf3452343f8adb4cd257c9222cb', 'ComicKiba', 'https://comickiba.com')
-	AddWebsiteModule('38ee90a6e1f343e284478e090399d7d2', 'MMScans', 'https://mm-scans.com')
+	AddWebsiteModule('38ee90a6e1f343e284478e090399d7d2', 'MMScans', 'https://mm-scans.org')
 	AddWebsiteModule('6d95277ed6864a16aeebf025ca667c3b', 'NovelMic', 'https://novelmic.com')
 	AddWebsiteModule('8c8adf7a1eba4b7cb449f1fd127fe696', 'ShieldManga', 'https://shieldmanga.club')
 	AddWebsiteModule('8e96a101438b401daf3a500590c91d62', 'Skymanhwa', 'https://skymanhwa.com')
@@ -466,6 +483,9 @@ function Init()
 	AddWebsiteModule('287f665620664e468d4e05f5d76f5a43', 'ResetScans', 'https://reset-scans.com')
 	AddWebsiteModule('287f665620664e468d4e05f5d76f5a44', 'HadesNoFansub', 'https://mangareaderpro.com/es')
 	AddWebsiteModule('287f665618784e468d4e05f5d76f5a45', 'EroManhwas', 'https://eromanhwas.com')
+	AddWebsiteModule('d9615a731b1243538663e96f0c1ad595', 'Manga347', 'https://manga347.com')
+	AddWebsiteModule('99bb0476a95e4590848c8fdc0c03817c', 'MangaCultivator', 'https://mangacultivator.com')
+	AddWebsiteModule('441c6a5b5cwt6590848c8fdd9d9b67a7', 'EroMangacrab', 'https://ero.mangacrab.com')
 
 	cat = 'Arabic-Scanlation'
 	AddWebsiteModule('7bda2905b61c49d1976777e9f2356361', '3asqOrg', 'https://3asq.org')

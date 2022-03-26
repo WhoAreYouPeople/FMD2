@@ -33,7 +33,7 @@ function getTitle(x)
 	if title == '' then title = x.XPathString('//h1') end
 	if title == '' then title = x.XPathString('//h2') end
 	title = title:gsub('Bahasa Indonesia$', ''):gsub(' Indonesia|Baca"', ''):gsub('Bahasa Indonesia', ''):gsub('Komik', ''):gsub(' Raw', ''):gsub(' Indonesia Terbaru','')
-	title = title:gsub('Manga', ''):gsub('Indonesia', ''):gsub('Baca', ''):gsub('bahasa', ''):gsub('indonesia', ''):gsub('|', '')
+	title = title:gsub('Indonesia', ''):gsub('Baca', ''):gsub('bahasa', ''):gsub('indonesia', ''):gsub('|', ''):gsub('-', '')
 	title = title:gsub(string.gsub(MODULE.Name, 'https://', ''), '')
 	return title
 end
@@ -224,6 +224,8 @@ function GetPageNumber()
 					TASK.PageLinks.Add(v.GetAttribute('src'))
 				end
 			end
+		elseif MODULE.ID == 'edf6b037808442508a3aaeb1413699bf' then -- KomikIndoID
+			x.XPathStringAll('//*[@id="Baca_Komik"]//img/@src', TASK.PageLinks)
 		else
 			-- common
 			x.ParseHTML(GetBetween('run(', ');', x.XPathString('//script[contains(., "ts_reader")]')))
@@ -240,6 +242,7 @@ function GetPageNumber()
 			if TASK.PageLinks.Count == 0 then x.XPathStringAll('//*[@class="entry-content"]//img/@src', TASK.PageLinks) end
 			if TASK.PageLinks.Count == 0 then x.XPathStringAll('//*[@class="bc"]/img/@src', TASK.PageLinks) end
 			if TASK.PageLinks.Count == 0 then x.XPathStringAll('//*[@id="chimg"]/img/@data-lazy-src', TASK.PageLinks) end
+			if TASK.PageLinks.Count == 0 then x.XPathStringAll('//*[@id="readerarea"]/img/@data-src', TASK.PageLinks) end
 		end
 		for i = 0, TASK.PageLinks.Count - 1 do -- Bypass 'i0.wp.com' image CDN to ensure original images are loaded directly from host
 			TASK.PageLinks[i] = TASK.PageLinks[i]:gsub("i%d.wp.com/", "")
@@ -309,6 +312,7 @@ function GetNameAndLink()
 			['ff17b64aa945403dae45706753235872'] = '/latest-update/?list', -- KomikNesia
 			['5474e31b24ab4908a5258176d1f24f67'] = '/komik/list-mode/', -- ManhwaTaro
 			['f794803973af4e5daab21683d4de873a'] = '/series/list-mode/', -- LuminousScans
+			['edf6b037808442508a3aaeb1413699bf'] = '/daftar-komik/?list' -- KomikIndoID
 		}
 		local dirurl = '/manga/list-mode/'
 		if dirs[MODULE.ID] ~= nil then
@@ -397,9 +401,12 @@ function Init()
 	AddWebsiteModule('5474e31b24ab4908a5258176d1f24f67', 'ManhwaTaro', 'https://manhwataro.xyz')
 	AddWebsiteModule('180a930232614f81816720cefeea7954', 'KoMBatch', 'https://kombatch.com')
 	AddWebsiteModule('4657d79e63dc4a9082a46b7981bde1b9', 'MangaBoruto', 'https://mangaboruto.xyz')
+	AddWebsiteModule('edf6b037808442508a3aaeb1413699bf', 'KomikIndoID', 'https://komikindo.id')
+	AddWebsiteModule('55cefd61a4144b56874108a666857ff0', 'WorldRomanceTranslation', 'https://wrt.my.id')
 
 	cat = 'Raw'
 	AddWebsiteModule('21b0dfcb262d4ae28520679165282666', 'Rawkuma', 'https://rawkuma.com')
+	AddWebsiteModule('5c3737434b964df7b76e5b27c2ad442c', 'MangasRaw', 'https://mangas-raw.com')
 
 	cat = 'Arabic'
 	AddWebsiteModule('0e45db2650604f74a0caeb7c1d69a749', 'MangaSWAT', 'https://mangaswat.com')
@@ -415,6 +422,7 @@ function Init()
 	AddWebsiteModule('275b85bdaafb47fdbc40f51d2bea99e8', 'TheApolloTeam', 'https://theapollo.team')
 	AddWebsiteModule('15fc68c57ce141f497b872af157d72ac', 'ShimadaScans', 'https://shimadascans.com')
 	AddWebsiteModule('f291e782dab54867a26a161934277177', 'ShiniScan', 'https://shiniscan.com')
+	AddWebsiteModule('3593adad980d454abe489c42e7158032', 'RealmScans', 'https://realmscans.com')
 
 	cat = 'Spanish'
 	AddWebsiteModule('41294a121062494489adfa601c442ef8', 'LegionAsia', 'https://legionasia.com')
