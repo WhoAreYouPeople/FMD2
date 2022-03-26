@@ -137,12 +137,27 @@ function _m.solveIUAMChallenge(self, body, url)
 end
 
 function _m.solveWithWebDriver(self, url)
+	print(url)
 	local rooturl = url:match('(https?://[^/]+)') or url
+	local py_cloudflare = [[lua\websitebypass\cloudflare.py]]
+	webdriver_exe = 'python'
+	webdriver_script = py_cloudflare
 
 	local s = nil
 	print(string.format('WebsitBypass[cloudflare]: using webdriver "%s" "%s" "%s" "%s"',webdriver_exe, webdriver_script, rooturl, HTTP.UserAgent))
-	_, s = require("fmd.subprocess").RunCommandHide(webdriver_exe, webdriver_script, rooturl, HTTP.UserAgent)
-
+	
+	-- _, s = require("fmd.subprocess").RunCommand(webdriver_exe, webdriver_script, url, HTTP.UserAgent)
+	-- Needs to run and return data
+	local command = string.format([==["C:\Users\John\AppData\Local\Programs\Python\Python310\python.exe" "C:\\Users\\John\\Documents\\GitHub\\FMD2\\lua\\websitebypass\\cloudflare.py" "URLHERE" "USERGENTHERE"]==])
+	command = '"'..command..'"'
+	--probs not require
+	--local file = io.popen(command)
+	--local output = file:read('*all')
+	--file:close()
+	--print(output)
+	-- End
+	_, s =os.execute(command)
+	print(_, s)
 	if not(s) or (s=="") then
 		LOGGER.SendError("WebsitBypass[cloudflare]: webdriver doesn't return anything (timeout)\r\n" .. url)
 		return -1
@@ -198,26 +213,33 @@ function _m.solveChallenge(self, url)
 		if use_webdriver then
 			return self:solveWithWebDriver(url)
 		end
+		LOGGER.SendError('reCapthca')
 		LOGGER.SendError('WebsitBypass[cloudflare]: detected reCapthca challenge, not supported right now. can be redirected to third party capthca solver in the future\r\n' .. url)
 		return -1
 	end
 	-- new IUAM challenge
 	if ((rc == 403) or (rc == 429) or (rc == 503)) and body:find('window%._cf_chl_opt={') then
-		if use_webdriver then
-			return self:solveWithWebDriver(url)
-		end
+		
+		LOGGER.SendError('IUAM')
 		LOGGER.SendError('WebsitBypass[cloudflare]: detected the new Cloudflare challenge, not supported yet\r\n' .. url)
-		return 0
+		return self:solveWithWebDriver(url)
 	end
 	-- IUAM challenge
 	if ((rc == 429) or (rc == 503)) and body:find('<form .-="challenge%-form" action="/.-__cf_chl_jschl_tk__=%S+"') then
 		return self:solveIUAMChallenge(body, url)
 	end
 
+	-- 1000S challenge
+	if ((rc == 403) and body:find('CLOUDFLARE_ERROR_1000S_BOX')) then
+		LOGGER.SendError('1000S')
+		return self:solveWithWebDriver(url)
+	end
+
 	if use_webdriver then
 		return self:solveWithWebDriver(url)
 	end
 
+	
 	LOGGER.SendWarning('WebsitBypass[cloudflare]: no Cloudflare solution found!\r\n' .. url)
 	return -1
 end
